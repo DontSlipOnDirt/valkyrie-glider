@@ -4,28 +4,42 @@ A complete Python + Arduino solution for controlling an RC plane using an Xbox c
 
 ## Quick Start (5 minutes)
 
-### 1. Install Dependencies
+### 1. Configure Python env
+Create Virtual Environment (I personally like to use [UV](https://docs.astral.sh/uv/), but you could use the native one as well).
+
+To create a virtual environment in your project directory, run:
+```bash
+python -m venv .venv
+```
+To activate it, use the appropriate command for your operating system and shell:
+
+- macOS/Linux (bash/zsh): `source .venv/bin/activate` \
+- Windows (cmd): `.venv\Scripts\activate.bat` \
+- Windows (PowerShell): `.venv\Scripts\Activate.ps1` 
+
+After activating, install the required packages:
 ```bash
 pip install -r requirements.txt
 ```
 
-### 2. Upload Arduino Code
+### 2. Upload Arduino Code to Transmitter/Receiver
 1. Open Arduino IDE
-2. Open `rc_plane_receiver.ino`
+2. Open `tx_code.ino`
 3. Select your board type and COM port
 4. Click Upload
 5. Note the COM port (e.g., COM3, COM4)
+6. Repeat for `rx_code.ino`
 
 ### 3. Find Your Arduino's COM Port
 ```bash
 python arduino_communicator.py
 ```
-Look for your Arduino in the output (usually CH340 USB device)
+Look for your Transmitter Arduino in the output (usually CH340 USB device)
 
 ### 4. Update Port in Code
-Edit the last line of `main_controller.py`:
+Edit one of the last lines of `main_controller.py`:
 ```python
-controller = RCPlaneController(arduino_port='COM3')  # Change COM3 to your port
+controller = RCPlaneController(arduino_port='COM3', ...)  # Change COM3 to your port
 ```
 
 ### 5. Test Xbox Controller
@@ -58,7 +72,7 @@ You should see throttle/pitch/roll/yaw values updating in real-time!
 | `value_mapper.py` | Converts analog input to 0-255 PWM |
 | `arduino_communicator.py` | Serial communication with Arduino |
 | `main_controller.py` | Main control loop (run this!) |
-| `rc_plane_receiver.ino` | Arduino firmware (upload to board) |
+| `tx_code.ino`,`rx_code.ino` | Arduino firmware (upload to board) |
 | `XBOX_TO_ARDUINO_GUIDE.md` | Detailed step-by-step guide |
 
 ---
