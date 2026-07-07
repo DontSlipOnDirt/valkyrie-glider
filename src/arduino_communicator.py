@@ -64,7 +64,7 @@ class ArduinoSerial:
             return False
         
         try:
-            # Build message: "P:throttle:128,pitch:200,roll:150,yaw:180\n"
+            # Build message: "P:throttle:128,pitch:200,roll:150"
             message = "P:"
             for channel, value in channel_values.items():
                 # Ensure value is in 0-255 range
@@ -88,7 +88,7 @@ class ArduinoSerial:
         Arduino must know the order of channels.
         
         Usage:
-            send_simple_values(128, 200, 150, 180)  # throttle,pitch,roll,yaw
+            send_simple_values(128, 200, 150)  # throttle,pitch,roll,yaw
         
         Args:
             values: Variable number of 0-255 integers

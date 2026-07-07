@@ -47,10 +47,10 @@ class RCPlaneController:
         
         # Define channel mappings: channel_name -> (xbox_input_name, mapper_function)
         self.control_mapping = {
-            'throttle': ('right_trigger', ControlMapping.map_trigger_to_pwm),
+            'throttle': ('left_trigger', ControlMapping.map_trigger_to_pwm),
             'pitch': ('left_stick_y', ControlMapping.map_stick_to_pwm),
             'roll': ('left_stick_x', ControlMapping.map_stick_to_pwm),
-            'yaw': ('right_stick_x', ControlMapping.map_stick_to_pwm),
+            # 'yaw' removed — no rudder
         }
         
         # Settings
@@ -98,7 +98,7 @@ class RCPlaneController:
         Blocks until interrupted.
         """
         try:
-            print(f"{'Throttle':>10} | {'Pitch':>10} | {'Roll':>10} | {'Yaw':>10}")
+            print(f"{'Throttle':>10} | {'Pitch':>10} | {'Roll':>10}")
             print("-" * 50)
             
             while self.running:
@@ -136,14 +136,13 @@ class RCPlaneController:
                 if self.use_named_format:
                     self.arduino.send_pwm_values(pwm_values)
                 else:
-                    # Send in fixed order: throttle, pitch, roll, yaw
                     self.arduino.send_simple_values(
                         pwm_values['throttle'],
                         pwm_values['pitch'],
                         pwm_values['roll'],
-                        pwm_values['yaw']
+                        # 'yaw' removed — no rudder
                     )
-                
+                    
                 # Print debug info (only update when values change significantly)
                 self._print_status(pwm_values)
                 
@@ -158,16 +157,16 @@ class RCPlaneController:
             self.cleanup()
             raise
     
+        
     def _print_status(self, pwm_values):
-        """Print current control values"""
         status = (
             f"\r{pwm_values['throttle']:>10} | "
             f"{pwm_values['pitch']:>10} | "
             f"{pwm_values['roll']:>10} | "
-            f"{pwm_values['yaw']:>10}"
+            # 'yaw' removed — no rudder
         )
         print(status, end='', flush=True)
-    
+        
     def cleanup(self):
         """Shutdown gracefully"""
         self.running = False
@@ -218,7 +217,7 @@ def main():
     
     try:
         controller = RCPlaneController(
-            arduino_port='COM7', # hardcoded for testing; replace with actual
+            arduino_port='COM3', # changed to work with Charis' computer
             baudrate=args.baud,
             use_named_format=not args.simple,
             loop_frequency=args.freq
