@@ -1,50 +1,43 @@
-#define SOFT_SPI_MISO_PIN 6
-#define SOFT_SPI_MOSI_PIN 5
-#define SOFT_SPI_SCK_PIN  4
-
 #include <SPI.h>
-#include <DigitalIO.h> 
 #include <RF24.h>
 
 #define CE_PIN   9
 #define CSN_PIN  10
 
 RF24 radio(CE_PIN, CSN_PIN);
-const byte address[6] = "00001"; 
+const byte address[6] = "00001";
 
-char inputBuffer[64];
+char inputBuffer[32];
 int bufferIdx = 0;
 
 void setup() {
-  Serial.begin(9600); 
-  
+  Serial.begin(9600);
+
   if (!radio.begin()) {
-    // If it gets stuck here, the Arduino cannot talk to the nRF24 chip!
     while (1) {
       Serial.println("RF24 Hardware Error!");
       delay(1000);
     }
   }
-  
+
   radio.openWritingPipe(address);
-  radio.setPALevel(RF24_PA_LOW); 
+  radio.setPALevel(RF24_PA_LOW);
+  radio.setChannel(76);
+  radio.setDataRate(RF24_1MBPS);
+  radio.enableDynamicPayloads();
   radio.stopListening();
-  
-  Serial.println("ready"); 
+
+  Serial.println("ready");
 }
 
 void loop() {
   while (Serial.available() > 0) {
     char c = Serial.read();
-    
     if (c == '\n') {
-      inputBuffer[bufferIdx] = '\0'; // Null-terminate string
-      
-      // Broadcast it over the air instantly
-      radio.write(&inputBuffer, sizeof(inputBuffer));
-      
-      bufferIdx = 0; // Reset buffer
-    } else if (bufferIdx < 63) {
+      inputBuffer[bufferIdx] = '\0';
+      radio.write(inputBuffer, bufferIdx + 1); // send only what's used
+      bufferIdx = 0;
+    } else if (bufferIdx < 31) {
       inputBuffer[bufferIdx++] = c;
     }
   }
