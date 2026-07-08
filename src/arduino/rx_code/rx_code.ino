@@ -6,13 +6,13 @@
 #define CSN_PIN  10
 
 #define THROTTLE_PIN 2   // ESC — not connected yet, harmless for now
-#define PITCH_PIN    3
-#define ROLL_PIN     7
+#define LEFT_SERVO_PIN    3
+#define RIGHT_SERVO_PIN     7
 
 RF24 radio(CE_PIN, CSN_PIN);
 const byte address[6] = "00001";
 
-Servo throttleServo, pitchServo, rollServo;
+Servo throttleServo, leftServo, rightServo;
 
 uint8_t throttle_value = 0;
 uint8_t pitch_value = 127;
@@ -40,19 +40,19 @@ void setup() {
   radio.startListening();
 
   throttleServo.attach(THROTTLE_PIN);
-  pitchServo.attach(PITCH_PIN);
-  rollServo.attach(ROLL_PIN);
+  leftServo.attach(LEFT_SERVO_PIN);
+  rightServo.attach(RIGHT_SERVO_PIN);
 
   throttleServo.write(0);   // safe idle for ESC once connected
-  pitchServo.write(90);
-  rollServo.write(90);
+  leftServo.write(90);
+  rightServo.write(90);
 
   lastReceiveTime = millis();
 }
 
 void loop() {
   if (radio.available()) {
-    char receivedMessage[32] = {0};
+    char receivedMessage[96] = {0};
     uint8_t len = radio.getDynamicPayloadSize();
     radio.read(&receivedMessage, len);
     //Serial.print("Nano2 received: ");
@@ -104,14 +104,14 @@ void parseMessage(char* message) {
 
 void applyControls() {
   // Re-center pitch/roll from 0–255 (mid ~127) to roughly -128..+128
-  int y = (int)pitch_value - 127;  // forward/back stick
-  int x = (int)roll_value  - 127;  // left/right stick
+  int stick_y = (int)pitch_value - 127;  // forward/back stick
+  int stick_x = (int)roll_value  - 127;  // left/right stick
 
-  int mix1 = constrain(y + x, -128, 128);  // Servo on PITCH_PIN (3)
-  int mix2 = constrain(y - x, -128, 128);  // Servo on ROLL_PIN (7)
+  int left_servo = constrain(-stick_x - stick_y, -128, 128);  // Servo on LEFT_SERVO_PIN (3)
+  int right_servo = constrain(-stick_x + stick_y, -128, 128);  // Servo on RIGHT_SERVO_PIN (7)
 
-  pitchServo.write(map(mix1, -128, 128, 60, 120)); // adjust 60/120 to your linkage throw
-  rollServo.write(map(mix2, -128, 128, 60, 120));
+  leftServo.write(map(left_servo, -128, 128, 60, 120)); // adjust 60/120 to your linkage throw
+  rightServo.write(map(right_servo, -128, 128, 60, 120));
 
   throttleServo.write(map(throttle_value, 0, 255, 0, 180));
 }

@@ -7,7 +7,7 @@
 RF24 radio(CE_PIN, CSN_PIN);
 const byte address[6] = "00001";
 
-char inputBuffer[32];
+char inputBuffer[96];
 int bufferIdx = 0;
 
 void setup() {
@@ -37,7 +37,7 @@ void loop() {
       inputBuffer[bufferIdx] = '\0';
       radio.write(inputBuffer, bufferIdx + 1); // send only what's used
       bufferIdx = 0;
-    } else if (bufferIdx < 31) {
+    } else if (bufferIdx < 95) {
       inputBuffer[bufferIdx++] = c;
     }
   }

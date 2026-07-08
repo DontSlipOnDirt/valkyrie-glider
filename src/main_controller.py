@@ -47,9 +47,11 @@ class RCPlaneController:
         
         # Define channel mappings: channel_name -> (xbox_input_name, mapper_function)
         self.control_mapping = {
-            'throttle': ('left_trigger', ControlMapping.map_trigger_to_pwm),
+            'throttle': ('right_trigger', ControlMapping.map_trigger_to_pwm),
             'pitch': ('left_stick_y', ControlMapping.map_stick_to_pwm),
             'roll': ('left_stick_x', ControlMapping.map_stick_to_pwm),
+            # 'pitch': ('left_stick_x', ControlMapping.map_stick_to_pwm),
+            # 'roll': ('left_stick_y', ControlMapping.map_stick_to_pwm),
             # 'yaw' removed — no rudder
         }
         
@@ -73,7 +75,7 @@ class RCPlaneController:
             
         Example:
             controller.set_control_mapping({
-                'throttle': ('left_trigger', ControlMapping.map_trigger_to_pwm),
+                'throttle': ('right_trigger', ControlMapping.map_trigger_to_pwm),
                 'pitch': ('right_stick_y', ControlMapping.map_stick_to_pwm),
             })
         """
